@@ -1,0 +1,1 @@
+# TYPE|BookingRef|Username|FlightNo|Details|Timestamp
