@@ -1,0 +1,99 @@
+-- database_schema.sql
+-- Run this in MySQL Workbench
+
+CREATE DATABASE IF NOT EXISTS airline_reservation_pk;
+USE airline_reservation_pk;
+
+-- Users table
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(15),
+    role ENUM('passenger', 'admin') DEFAULT 'passenger',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Flights table
+CREATE TABLE flights (
+    flight_id INT PRIMARY KEY AUTO_INCREMENT,
+    flight_number VARCHAR(10) UNIQUE NOT NULL,
+    airline VARCHAR(50) NOT NULL,
+    source VARCHAR(50) NOT NULL,
+    destination VARCHAR(50) NOT NULL,
+    departure_date DATE NOT NULL,
+    departure_time TIME NOT NULL,
+    arrival_time TIME NOT NULL,
+    total_seats INT NOT NULL,
+    available_seats INT NOT NULL,
+    base_price DECIMAL(10,2) NOT NULL,
+    flight_type ENUM('domestic', 'international') DEFAULT 'domestic',
+    status ENUM('active', 'cancelled', 'completed') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bookings table
+CREATE TABLE bookings (
+    booking_id INT PRIMARY KEY AUTO_INCREMENT,
+    booking_reference VARCHAR(20) UNIQUE NOT NULL,
+    user_id INT NOT NULL,
+    flight_id INT NOT NULL,
+    seat_numbers VARCHAR(100) NOT NULL,
+    passenger_count INT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    booking_status ENUM('confirmed', 'cancelled', 'pending') DEFAULT 'confirmed',
+    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
+);
+
+-- Payments table
+CREATE TABLE payments (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    booking_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50),
+    payment_status ENUM('success', 'failed', 'refunded') DEFAULT 'success',
+    transaction_id VARCHAR(100) UNIQUE,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id) ON DELETE CASCADE
+);
+
+-- Insert admin user (password: admin123)
+INSERT INTO users (username, password, email, full_name, phone_number, role) 
+VALUES ('admin', 'admin123', 'admin@flyjinnah.com', 'System Administrator', '03001234567', 'admin');
+
+-- Domestic flights (June 11-12)
+UPDATE flights SET departure_date = '2026-06-11' WHERE flight_number = '9P-741';
+UPDATE flights SET departure_date = '2026-06-11' WHERE flight_number = 'PA-201';
+UPDATE flights SET departure_date = '2026-06-11' WHERE flight_number = '9P-742';
+UPDATE flights SET departure_date = '2026-06-11' WHERE flight_number = 'ED-301';
+UPDATE flights SET departure_date = '2026-06-12' WHERE flight_number = 'PA-202';
+UPDATE flights SET departure_date = '2026-06-12' WHERE flight_number = '9P-743';
+UPDATE flights SET departure_date = '2026-06-12' WHERE flight_number = 'PA-203';
+UPDATE flights SET departure_date = '2026-06-12' WHERE flight_number = 'ED-302';
+
+-- International flights (June 13-15)
+UPDATE flights SET departure_date = '2026-06-13' WHERE flight_number = '9P-801';
+UPDATE flights SET departure_date = '2026-06-13' WHERE flight_number = 'ED-501';
+UPDATE flights SET departure_date = '2026-06-14' WHERE flight_number = '9P-802';
+UPDATE flights SET departure_date = '2026-06-14' WHERE flight_number = 'PA-701';
+UPDATE flights SET departure_date = '2026-06-15' WHERE flight_number = 'PA-702';
+
+
+
+UPDATE flights SET departure_time = '07:30:00', arrival_time = '09:15:00' WHERE flight_number = '9P-741';
+UPDATE flights SET departure_time = '10:00:00', arrival_time = '11:30:00' WHERE flight_number = 'PA-201';
+UPDATE flights SET departure_time = '13:45:00', arrival_time = '15:30:00' WHERE flight_number = '9P-742';
+UPDATE flights SET departure_time = '16:00:00', arrival_time = '17:00:00' WHERE flight_number = 'ED-301';
+UPDATE flights SET departure_time = '08:00:00', arrival_time = '09:45:00' WHERE flight_number = 'PA-202';
+UPDATE flights SET departure_time = '11:30:00', arrival_time = '12:45:00' WHERE flight_number = '9P-743';
+UPDATE flights SET departure_time = '15:00:00', arrival_time = '15:45:00' WHERE flight_number = 'PA-203';
+UPDATE flights SET departure_time = '19:00:00', arrival_time = '20:45:00' WHERE flight_number = 'ED-302';
+UPDATE flights SET departure_time = '21:00:00', arrival_time = '23:30:00' WHERE flight_number = '9P-801';
+UPDATE flights SET departure_time = '23:00:00', arrival_time = '03:00:00' WHERE flight_number = 'ED-501';
+UPDATE flights SET departure_time = '09:00:00', arrival_time = '11:30:00' WHERE flight_number = '9P-802';
+UPDATE flights SET departure_time = '10:00:00', arrival_time = '17:30:00' WHERE flight_number = 'PA-701';
+UPDATE flights SET departure_time = '20:00:00', arrival_time = '12:00:00' WHERE flight_number = 'PA-702';
